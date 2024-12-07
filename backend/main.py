@@ -6,7 +6,6 @@ from flask_cors import CORS
 from jinja2 import Environment, FileSystemLoader
 
 # Lógica de conversión desde la terminal
-
 def convert_markdown_to_html(markdown_content):
     """Convierte el contenido markdown a HTML."""
     return markdown.markdown(markdown_content)
@@ -48,28 +47,28 @@ def process_files_from_directory(markdown_dir, output_dir, template):
                 print(f"Procesando el archivo {file_path}...")
                 process_single_file(file_path, output_dir, template)
 
-# Lógica para procesar archivos desde la terminal
-def process_files_from_terminal(args):
-    if os.path.isfile(args.file):  # Si el argumento es un archivo
-        print(f"Procesando el archivo {args.file}...")
-        process_single_file(args.file, args.output, args.template or "default.html")
-    elif os.path.isdir(args.file):  # Si el argumento es un directorio
-        print(f"Procesando todos los archivos .md en {args.file}...")
-        process_files_from_directory(args.file, args.output, args.template or "default.html")
-    else:
-        print(f"La ruta proporcionada no es válida: {args.file}")
-
 # Función para gestionar los argumentos de la terminal
 def parse_arguments():
     parser = argparse.ArgumentParser(description="ChismePress: Un generador de sitios estáticos.")
-    parser.add_argument("file", help="Ruta al archivo Markdown o directorio que se va a convertir.")  # Argumento de archivo o directorio
+    parser.add_argument("file", help="Ruta al archivo Markdown o directorio que se va a convertir.", nargs="?", default=None)  # Argumento de archivo o directorio
     parser.add_argument("-o", "--output", default="output", help="Directorio de salida para los archivos HTML generados.")
     parser.add_argument("-t", "--template", help="Ruta a un archivo de plantilla Jinja2.")
     parser.add_argument("--generate", action='store_true', help="Indica si se debe generar el archivo Markdown a HTML.")  # Agregar el flag --generate
     return parser.parse_args()
 
+# Lógica para procesar archivos desde la terminal
+def process_files_from_terminal(args):
+    if args.file and os.path.isfile(args.file):  # Si el argumento es un archivo
+        print(f"Procesando el archivo {args.file}...")
+        process_single_file(args.file, args.output, args.template or "default.html")
+    elif args.file and os.path.isdir(args.file):  # Si el argumento es un directorio
+        print(f"Procesando todos los archivos .md en {args.file}...")
+        process_files_from_directory(args.file, args.output, args.template or "default.html")
+    else:
+        print(f"La ruta proporcionada no es válida: {args.file}")
 
-#**** Lógica de la API Flask para el Frontend*****
+
+# Lógica de la API Flask para el Frontend
 
 app = Flask(__name__)
 
